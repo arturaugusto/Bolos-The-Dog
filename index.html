@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style type="text/css">
+    
+    button {
+      border: none;
+      background: cadetblue;
+    }
+
+    body {
+      user-select: none;
+      background: black;
+      font-family: sans-serif;
+      size: 16px;
+      color: white;
+      /*background: repeating-linear-gradient( 80deg, #000000, #3f51b5 1px, #56221d 2.1px, #56221d 2.1px )*/
+
+    }
+    #canvas {
+      
+      background: repeating-linear-gradient(
+        45deg,
+        #67d390,
+        #67d390 1px,
+        #399e8f 1.1px,
+        #399e8f 1.1px
+      );
+    }
+
+    #canvas {
+      display: block;
+      margin: 0 auto;
+
+    }
+
+    .controls {
+      width: 50%;
+      margin: 0 auto;
+    }
+
+    p {
+      font-size: 20px;
+    }
+  </style>
+  <script type="text/javascript" src="./bayes.js"></script>
+  <script type="text/javascript" src="./data.js"></script>
+  <script type="text/javascript" src="./audio.js"></script>
+</head>
+<body>
+
+  <div id="intro">
+    <p>This is Bolos, a firefighter dog. He is brave and and loyal, with a whistle he becomes very fast. (use your microphone for this!).</p>
+    <p>Help him to extinguish the fire and defeat the Evil Bozonardo !</p>
+    <p>Use wasd or arrow keys to direct him.</p>
+    <div class="controls" style="width: 100px;">
+      <button id="introSkip">Start</button>
+    </div>
+  </div>
+
+  <div id="main" style="display: none;">
+    <canvas id="canvas"></canvas>
+    
+    <div id="test"></div>
+
+    <div class="controls">
+      <span>Threshold:</span> <input type="range" id="threshold" min="0" max="255" value="30" style="width: 60px;"> <span id="msgel"></span>
+    </div>
+
+    <div class="controls">
+      <span>Enemies</span> <input type="number" id="enemyCnt" min="1" max="10" value="1" style="width: 60px;">
+      <span>Fires</span> <input type="number" id="fireCnt" min="3" max="20" value="5" style="width: 60px;">
+      <span>Cows</span> <input type="number" id="cowCnt" min="3" max="20" value="10" style="width: 60px;">
+      <button id="newGameBtn">New game</button>
+    </div>
+
+    <div class="wrapper" style="position: fixed;">
+      <canvas id="visualizer"></canvas>
+    </div>
+    
+  </div>
+
+  <script type="text/javascript" charset="utf-8" src="main.js"></script>
+</body>
+</html>
