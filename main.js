@@ -22,12 +22,13 @@ var IMGS = {}
 var EMOJID = 54
 var EMOJIR = EMOJID/2
 
-var imgsLabels = ['enemy', 'cow', 'fire', 'tree0', 'tree1', 'meat', 'dog', 'droplet']
-'👹 🐮 🔥 🌲 🌳 🍖 🐶 💧'.split(' ').map((emoji, i) => {
+var imgsLabels = ['enemy', 'cow', 'fire', 'tree0', 'tree1', 'meat', 'dog', 'droplet', 'sunflower']
+'👹 🐮 🔥 🌲 🌳 🍖 🐶 💧 🌻'.split(' ').map((emoji, i) => {
   let imgCanvas = document.createElement('canvas')
   imgCanvas.width = EMOJID
   imgCanvas.height = EMOJID
-  //document.getElementById('test').appendChild(imgCanvas)
+  let introTargetEl = document.getElementById('intro_'+imgsLabels[i])
+  if (introTargetEl) introTargetEl.appendChild(imgCanvas)
   let ctx = imgCanvas.getContext('2d')
   ctx.font = '50px serif'
   ctx.textAlign = 'center';
@@ -113,7 +114,7 @@ var initWorld = () => {
   })
 
   // and some trees
-  new Array(20).fill(0).forEach((item, i) => {
+  new Array(15).fill(0).forEach((item, i) => {
     WORLD.push(
       Object({
         type: 'tree'+(i%2),
@@ -123,26 +124,47 @@ var initWorld = () => {
       })
     )
   })
+
+  // and some sunflowers
+  new Array(2).fill(0).forEach((item, i) => {
+    WORLD.push(
+      Object({
+        type: 'sunflower',
+        x: randomMinMax(0, canvas.width-EMOJID),
+        y: randomMinMax(0, canvas.height-EMOJID),
+        life: 100
+      })
+    )
+  })
+
+
   YOUWIN = false
 }
 
 
+const paingOrder = ['meat', 'cow', 'tree0', 'sunflower', 'tree1', 'fire', 'enemy', 'dog', 'droplet']
+
+const drawItem = item => {
+  let img = IMGS[item.type]
+  ctx.drawImage(img, item.x, item.y, img.width, img.height)
+}
 
 // render all, in order
-const render = () => {  
+const render = () => {
   if (!YOUWIN) ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-  ;['meat', 'cow', 'tree0', 'tree1', 'fire', 'enemy', 'dog', 'droplet'].forEach(imgLabel => {
-    WORLD.filter(x => x.type === imgLabel).forEach(item => {
-      let img = IMGS[item.type]
-      ctx.drawImage(img, item.x, item.y, img.width, img.height)    
-    })
-  })
+  // draw items back of dog
+  paingOrder.forEach(imgLabel => WORLD
+    .filter(x => x.type === imgLabel && !x.toFront).forEach(drawItem))
+    
+  // draw items in on front of dog
+  paingOrder.forEach(imgLabel => WORLD
+    .filter(x => x.type === imgLabel && x.toFront).forEach(drawItem))
 
   if (YOUWIN) {
     ctx.font = '50px Verdana'
     ctx.textAlign = 'center';
-    ctx.fillStyle = "#3f51b5"
+    ctx.fillStyle = "#3f51b5";
     ctx.strokeStyle = 'black';
 
     ctx.textBaseline = 'middle'
@@ -192,6 +214,19 @@ const update = (t) => {
   } 
   var fires = WORLD.filter(x => x.type === 'fire')
   var droplets = WORLD.filter(x => x.type === 'droplet')
+
+  // achieve a simple perspective effect
+  var perspectiveFixItems = WORLD
+    .filter(x => ['cow', 'tree0', 'tree1', 'sunflower'].indexOf(x.type) !== -1)
+    .forEach(item => {
+      if (collisionCheck(item, dog)) {
+        if (item.y > (dog.y - EMOJIR/5)) {
+          item.toFront = true
+        } else {
+          item.toFront = false
+        }
+      }
+    })
   
   if (fires.length === 0) YOUWIN = true
   
@@ -224,13 +259,12 @@ const update = (t) => {
     }
 
 
-    //console.log(fires.length)
-
     if (item.type === 'droplet') {
       fires.forEach(fire => {
         if (collisionCheck(item, fire)) {
           fire.life = Math.max(0, fire.life-0.1*dt)
           item.life = Math.max(0, item.life-0.1*dt)
+          if (item.life <= 0) msgel.innerText = "I need more water!"
         }
       })
     }
@@ -238,7 +272,7 @@ const update = (t) => {
     if (item.type === 'dog') {
       if (item.hasDroplet) {
         item.hasDroplet.x = item.x
-        item.hasDroplet.y = item.y
+        item.hasDroplet.y = item.y+10
       } else {
         droplets.forEach(droplet => {
           if (collisionCheck(item, droplet)) {
@@ -256,21 +290,22 @@ const update = (t) => {
         fires.forEach(fire => {
           if (collisionCheck(item, fire)) {
             msgel.innerText = "I can't pass through the fire!"
-            if (fire.x < item.x) {
-              item.xdir = 1
-            } else {
-              item.xdir = -1
-            }            
-            if (fire.y < item.y) {
-              item.ydir = 1
-            } else {
-              item.ydir = -1
-            }
+            item.xdir = 0
+            item.ydir = 0
 
-            if (randomPick([true, false])) {
+            if (randomPick([0, 1]) === 1) {
+              if (fire.x < item.x) {
+                item.xdir = 1
+              } else {
+                item.xdir = -1
+              }            
             } else {
+              if (fire.y < item.y) {
+                item.ydir = 1
+              } else {
+                item.ydir = -1
+              }              
             }
-            
           }
         })
       }
@@ -280,6 +315,7 @@ const update = (t) => {
           meat.life = 0
           item.speed = DOGSPEED/3
           msgel.innerText = "I fell full of food... Will be good on a whistle."
+          item.greedy = true
         }
       })
     }
@@ -304,15 +340,17 @@ const update = (t) => {
 
 document.getElementById('newGameBtn').addEventListener('click', initWorld)
 
-
 document.getElementById('introSkip').addEventListener('click', () => {
+  initAudio()
   document.getElementById('intro').style.display = 'none'
   document.getElementById('main').style = ''
 
   window.addEventListener('keydown', (evt) => {
     dog.xdir = 0
     dog.ydir = 0
-    dog.speed = DOGSPEED
+
+    if (!dog.greedy) dog.speed = DOGSPEED
+    
     if (evt.code === 'KeyA' || evt.code === 'ArrowLeft') dog.xdir = -1
     if (evt.code === 'KeyD' || evt.code === 'ArrowRight') dog.xdir = 1
     if (evt.code === 'KeyW' || evt.code === 'ArrowUp') dog.ydir = -1
@@ -330,6 +368,3 @@ document.getElementById('introSkip').addEventListener('click', () => {
     main()
   })()
 })
-
-  
-document.body.addEventListener('click', initAudio);

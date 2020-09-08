@@ -4,7 +4,6 @@ Inspired by: https://github.com/mdn/voice-change-o-matic/blob/gh-pages/scripts/a
 
 var grab = []
 function initAudio() {
-  document.body.removeEventListener('click', initAudio)
 if (navigator.mediaDevices === undefined) {
     navigator.mediaDevices = {};
   }
@@ -107,18 +106,20 @@ if (navigator.mediaDevices === undefined) {
             if (bindex === 0) {
               console.log('fiu', score)
               dog.speed = DOGSPEED*3
+              dog.greedy = false
               msgel.innerText = randomPick(["Run, Forrest, Run! 🏃", "Fast and furious! 😎", "WEEE-OOOO-WEEE-OOOO! 🚒"])
             }
 
             // detect `SNDNOISE`
             if (bindex === 1) {
-              console.log('noise', score)
+              //console.log('noise', score)
               msgel.innerText = "Error 404: Sound command not found!"
             }
 
             // detect `SNDTAC`
             if (bindex === 2 && (score > 100)) {
-              console.log('tac', score)
+              //console.log('tac', score)
+              msgel.innerText = "Error 404: Sound not recognized!"
             }
           }
         }

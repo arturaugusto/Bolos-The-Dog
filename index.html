@@ -11,6 +11,7 @@
     }
 
     body {
+      overflow: hidden;
       user-select: none;
       background: black;
       font-family: sans-serif;
@@ -44,7 +45,19 @@
     p {
       font-size: 20px;
     }
+
+    #intro p {
+      width: 50%;
+      margin: 0 auto;
+      vertical-align: 40em;
+    }
+
+    #msgel {
+      color: red;
+    }
+
   </style>
+
   <script type="text/javascript" src="./bayes.js"></script>
   <script type="text/javascript" src="./data.js"></script>
   <script type="text/javascript" src="./audio.js"></script>
@@ -52,12 +65,27 @@
 <body>
 
   <div id="intro">
-    <p>This is Bolos, a firefighter dog. He is brave and and loyal, with a whistle he becomes very fast. (use your microphone for this!).</p>
-    <p>Help him to extinguish the fire and defeat the Evil Bozonardo !</p>
-    <p>Use wasd or arrow keys to direct him.</p>
-    <div class="controls" style="width: 100px;">
-      <button id="introSkip">Start</button>
+    <p>This is Bolos<span id="intro_dog"></span>, a brave and and loyal firefighter dog that knows a trick. A <strong>whistle (assobio, gwizdać, fischio...)</strong> makes him very fast, even when he eats <span id="intro_meat"></span> a lot! (use your microphone! But unrecognized sounds will throw a 404 error and can make Bolos disoriented).</p>
+
+    
+    <p>Help him to extinguish the fire and defeat the evil Bozonardo<span id="intro_enemy"></span>!</p>
+    
+    <br>
+    <p>Use WASD or ↑↓←→ keys to direct him to grab and spread water droplets<span id="intro_droplet"></span> to extinguish fire<span id="intro_fire"></span>! (don't worry, he's very skilled and will not get hurt.)</p>
+
+    <br><br><br>
+
+    <p style="text-align:center;">
+      <button id="introSkip" style="width:160px;height:30px;">Start</button>
+    </p>
+    
+    <br>
+    <div style="text-align:center;">
+      <span id="intro_tree0"></span>
+      <span id="intro_cow"></span>
+      <span id="intro_tree1"></span>
     </div>
+
   </div>
 
   <div id="main" style="display: none;">
@@ -66,14 +94,15 @@
     <div id="test"></div>
 
     <div class="controls">
-      <span>Threshold:</span> <input type="range" id="threshold" min="0" max="255" value="30" style="width: 60px;"> <span id="msgel"></span>
+      <h3 style="height: 6px;" id="msgel"></h3>
+      <span>Sound threshold:</span> <input type="range" id="threshold" min="0" max="255" value="130" style="width: 60px;">
     </div>
 
     <div class="controls">
       <span>Enemies</span> <input type="number" id="enemyCnt" min="1" max="10" value="1" style="width: 60px;">
       <span>Fires</span> <input type="number" id="fireCnt" min="3" max="20" value="5" style="width: 60px;">
       <span>Cows</span> <input type="number" id="cowCnt" min="3" max="20" value="10" style="width: 60px;">
-      <button id="newGameBtn">New game</button>
+      <button id="newGameBtn" style="width:160px;height:30px;">New game</button>
     </div>
 
     <div class="wrapper" style="position: fixed;">
